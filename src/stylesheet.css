@@ -1,5 +1,11 @@
 .clipboard-preview {
+    min-width: 150px;
     max-width: 300px;
+}
+
+.clipboard-metadata {
+    font-size: 1em;
+    opacity: 0.65;
 }
 
 .clipboard-clear-button {

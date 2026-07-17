@@ -1,18 +1,23 @@
 UUID := clipboard-watcher@slobbe.github.io
 DIST_DIR := dist
 ARCHIVE := $(DIST_DIR)/$(UUID).zip
-SOURCES := src/extension.js src/stylesheet.css metadata.json
+SOURCE_FILES := $(shell find src -type f)
+METADATA_FILE := metadata.json
+PACKAGE_FILES := $(SOURCE_FILES) $(METADATA_FILE)
+JAVASCRIPT_FILES := $(shell find src -type f -name '*.js')
 
 .PHONY: zip check install clean enable disable reload uninstall
 
 zip: $(ARCHIVE)
 
 check:
-	node --check src/extension.js
+	@for source in $(JAVASCRIPT_FILES); do node --check $$source || exit $$?; done
 
-$(ARCHIVE): $(SOURCES)
+$(ARCHIVE): $(PACKAGE_FILES)
 	mkdir -p $(DIST_DIR)
-	zip -FS --quiet --junk-paths $@ $(SOURCES)
+	rm -f $@
+	cd src && zip -qr ../$@ .
+	zip -q $@ $(METADATA_FILE)
 
 install: zip
 	gnome-extensions install --force $(ARCHIVE)
