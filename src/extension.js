@@ -56,9 +56,26 @@ export default class ClipboardWatcherExtension extends Extension {
         clipboard.get_text(St.ClipboardType.CLIPBOARD, (_clipboard, text) => {
             if (!this._previewItem) return;
 
-            const preview = this._formatPreview(text ?? "");
-            this._setPreview(preview);
+            const mimeTypes = clipboard.get_mimetypes(
+                St.ClipboardType.CLIPBOARD,
+            ) ?? [];
+            this._setPreview(this._formatClipboardPreview(text, mimeTypes));
         });
+    }
+
+    _formatClipboardPreview(text, mimeTypes) {
+        if (text)
+            return this._formatPreview(text);
+
+        const mimeType = mimeTypes.find(type =>
+            !type.startsWith("text/") &&
+            !["UTF8_STRING", "STRING", "COMPOUND_TEXT"].includes(type),
+        );
+
+        if (!mimeType)
+            return "Clipboard is empty";
+
+        return `[${mimeType}]`;
     }
 
     _clearClipboard() {
