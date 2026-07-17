@@ -5,6 +5,8 @@ import * as Main from "resource:///org/gnome/shell/ui/main.js";
 import * as PanelMenu from "resource:///org/gnome/shell/ui/panelMenu.js";
 import * as PopupMenu from "resource:///org/gnome/shell/ui/popupMenu.js";
 
+const MAX_PREVIEW_LINES = 5;
+
 export default class ClipboardWatcherExtension extends Extension {
     enable() {
         this._indicator = new PanelMenu.Button(0, "Clipboard Watcher");
@@ -98,10 +100,15 @@ export default class ClipboardWatcherExtension extends Extension {
     }
 
     _formatPreview(text) {
-        const preview = text.trim();
+        const lines = text
+            .trim()
+            .split(/\r?\n/)
+            .filter(line => line.trim());
 
-        if (!preview) return "Clipboard is empty";
+        if (lines.length === 0) return "Clipboard is empty";
 
-        return preview;
+        return lines.length > MAX_PREVIEW_LINES
+            ? `${lines.slice(0, MAX_PREVIEW_LINES).join("\n")}\n…`
+            : lines.join("\n");
     }
 }
