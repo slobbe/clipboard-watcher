@@ -5,8 +5,6 @@ import * as Main from "resource:///org/gnome/shell/ui/main.js";
 import * as PanelMenu from "resource:///org/gnome/shell/ui/panelMenu.js";
 import * as PopupMenu from "resource:///org/gnome/shell/ui/popupMenu.js";
 
-const MAX_PREVIEW_LENGTH = 40;
-
 export default class ClipboardWatcherExtension extends Extension {
     enable() {
         this._indicator = new PanelMenu.Button(0, "Clipboard Watcher");
