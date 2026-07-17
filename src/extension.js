@@ -10,6 +10,7 @@ const MAX_PREVIEW_LINES = 5;
 
 export default class ClipboardWatcherExtension extends Extension {
     enable() {
+        this._clipboardReadId = 0;
         this._indicator = new PanelMenu.Button(0, "Clipboard Watcher");
 
         this._indicator.add_child(
@@ -62,6 +63,7 @@ export default class ClipboardWatcherExtension extends Extension {
     }
 
     disable() {
+        this._clipboardReadId++;
         this._indicator?.destroy();
         this._indicator = null;
         this._previewItem = null;
@@ -72,9 +74,10 @@ export default class ClipboardWatcherExtension extends Extension {
 
     _readClipboard() {
         const clipboard = St.Clipboard.get_default();
+        const readId = ++this._clipboardReadId;
 
         clipboard.get_text(St.ClipboardType.CLIPBOARD, (_clipboard, text) => {
-            if (!this._previewItem) return;
+            if (!this._previewItem || readId !== this._clipboardReadId) return;
 
             const mimeTypes = clipboard.get_mimetypes(
                 St.ClipboardType.CLIPBOARD,
@@ -83,11 +86,16 @@ export default class ClipboardWatcherExtension extends Extension {
 
             this._setPreview(preview);
             this._setFooterVisible(preview !== "Clipboard is empty");
-            this._setMetadata(
-                text && preview !== "Clipboard is empty"
-                    ? this._formatMetadata(text)
-                    : null,
-            );
+            if (text && preview !== "Clipboard is empty") {
+                this._setMetadata(this._formatMetadata(text));
+                return;
+            }
+
+            const mimeType = this._findNonTextMimeType(mimeTypes);
+            if (mimeType)
+                this._readNonTextSize(clipboard, mimeType, readId);
+            else
+                this._setMetadata(null);
         });
     }
 
@@ -95,10 +103,7 @@ export default class ClipboardWatcherExtension extends Extension {
         if (text)
             return this._formatPreview(text);
 
-        const mimeType = mimeTypes.find(type =>
-            !type.startsWith("text/") &&
-            !["UTF8_STRING", "STRING", "COMPOUND_TEXT"].includes(type),
-        );
+        const mimeType = this._findNonTextMimeType(mimeTypes);
 
         if (!mimeType)
             return "Clipboard is empty";
@@ -106,8 +111,32 @@ export default class ClipboardWatcherExtension extends Extension {
         return `[${mimeType}]`;
     }
 
+    _findNonTextMimeType(mimeTypes) {
+        return mimeTypes.find(type =>
+            !type.startsWith("text/") &&
+            !["UTF8_STRING", "STRING", "COMPOUND_TEXT"].includes(type),
+        );
+    }
+
+    _readNonTextSize(clipboard, mimeType, readId) {
+        this._setMetadata(null);
+        clipboard.get_content(
+            St.ClipboardType.CLIPBOARD,
+            mimeType,
+            (_clipboard, bytes) => {
+                if (!this._metadataLabel || readId !== this._clipboardReadId)
+                    return;
+
+                this._setMetadata(
+                    bytes ? this._formatByteSize(bytes.get_size()) : null,
+                );
+            },
+        );
+    }
+
     _clearClipboard() {
         const clipboard = St.Clipboard.get_default();
+        this._clipboardReadId++;
 
         clipboard.set_text(St.ClipboardType.CLIPBOARD, "");
 
