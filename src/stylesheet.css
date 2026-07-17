@@ -1,0 +1,13 @@
+.clipboard-preview {
+    max-width: 300px;
+}
+
+.clipboard-preview-empty {
+    font-style: italic;
+    font-family: sans-serif;
+}
+
+.clipboard-preview-content {
+    font-style: normal;
+    font-family: monospace;
+}

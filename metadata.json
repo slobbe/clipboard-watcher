@@ -1,0 +1,8 @@
+{
+    "uuid": "clipboard-watcher@slobbe.github.io",
+    "name": "Clipboard Watcher",
+    "description": "Watch the contents of the clipboard",
+    "shell-version": [ "45", "46", "47", "48", "49" ],
+    "url": "https://github.com/slobbe/clipboard-watcher",
+    "version-name": "0.1.0"
+}
