@@ -2,6 +2,19 @@
     max-width: 300px;
 }
 
+.clipboard-clear-button {
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.clipboard-clear-button:hover {
+    background-color:  rgba(224, 27, 36, 0.35);
+}
+
+.clipboard-clear-button:active {
+    background-color: rgba(192, 28, 40, 0.55);
+}
+
 .clipboard-preview-empty {
     font-style: italic;
     font-family: sans-serif;

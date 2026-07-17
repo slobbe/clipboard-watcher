@@ -1,3 +1,4 @@
+import Clutter from "gi://Clutter";
 import St from "gi://St";
 
 import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
@@ -26,16 +27,32 @@ export default class ClipboardWatcherExtension extends Extension {
         this._setPreview("Clipboard is empty");
         this._indicator.menu.addMenuItem(this._previewItem);
 
-        this._indicator.menu.addMenuItem(
-            new PopupMenu.PopupSeparatorMenuItem(),
-        );
+        this._footerSeparator = new PopupMenu.PopupSeparatorMenuItem();
+        this._indicator.menu.addMenuItem(this._footerSeparator);
 
-        const clearItem = new PopupMenu.PopupMenuItem("Clear");
-        clearItem.connect("activate", () => {
+        this._footerRow = new PopupMenu.PopupBaseMenuItem({
+            reactive: false,
+            can_focus: false,
+        });
+        this._metadataLabel = new St.Label({
+            x_expand: true,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+
+        const clearButton = new St.Button({
+            label: "Clear",
+            style_class: "clipboard-clear-button",
+            track_hover: true,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        clearButton.connect("clicked", () => {
             this._clearClipboard();
         });
 
-        this._indicator.menu.addMenuItem(clearItem);
+        this._footerRow.add_child(this._metadataLabel);
+        this._footerRow.add_child(clearButton);
+        this._indicator.menu.addMenuItem(this._footerRow);
+        this._setFooterVisible(false);
 
         this._indicator.menu.connect("open-state-changed", (_menu, open) => {
             if (open) this._readClipboard();
@@ -48,6 +65,9 @@ export default class ClipboardWatcherExtension extends Extension {
         this._indicator?.destroy();
         this._indicator = null;
         this._previewItem = null;
+        this._metadataLabel = null;
+        this._footerRow = null;
+        this._footerSeparator = null;
     }
 
     _readClipboard() {
@@ -59,7 +79,15 @@ export default class ClipboardWatcherExtension extends Extension {
             const mimeTypes = clipboard.get_mimetypes(
                 St.ClipboardType.CLIPBOARD,
             ) ?? [];
-            this._setPreview(this._formatClipboardPreview(text, mimeTypes));
+            const preview = this._formatClipboardPreview(text, mimeTypes);
+
+            this._setPreview(preview);
+            this._setFooterVisible(preview !== "Clipboard is empty");
+            this._setMetadata(
+                text && preview !== "Clipboard is empty"
+                    ? this._formatMetadata(text)
+                    : null,
+            );
         });
     }
 
@@ -84,6 +112,8 @@ export default class ClipboardWatcherExtension extends Extension {
         clipboard.set_text(St.ClipboardType.CLIPBOARD, "");
 
         this._setPreview("Clipboard is empty");
+        this._setFooterVisible(false);
+        this._setMetadata(null);
     }
 
     _setPreview(preview) {
@@ -99,11 +129,43 @@ export default class ClipboardWatcherExtension extends Extension {
         );
     }
 
+    _setMetadata(metadata) {
+        this._metadataLabel.text = metadata ?? "";
+    }
+
+    _setFooterVisible(visible) {
+        this._footerRow.visible = visible;
+        this._footerSeparator.visible = visible;
+    }
+
+    _formatMetadata(text) {
+        const characterCount = Array.from(text).length;
+        const byteCount = new TextEncoder().encode(text).length;
+
+        return `${characterCount} ${characterCount === 1 ? "char" : "chars"} · ${this._formatByteSize(byteCount)}`;
+    }
+
+    _formatByteSize(byteCount) {
+        const units = ["B", "KB", "MB", "GB"];
+        let size = byteCount;
+        let unitIndex = 0;
+
+        while (size >= 1024 && unitIndex < units.length - 1) {
+            size /= 1024;
+            unitIndex++;
+        }
+
+        return unitIndex === 0
+            ? `${size} ${units[unitIndex]}`
+            : `${size.toFixed(1)} ${units[unitIndex]}`;
+    }
+
     _formatPreview(text) {
         const lines = text
             .trim()
             .split(/\r?\n/)
-            .filter(line => line.trim());
+            .filter(line => line.trim())
+            .map(line => line.trim());
 
         if (lines.length === 0) return "Clipboard is empty";
 
