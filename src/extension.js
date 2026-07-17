@@ -38,17 +38,13 @@ export default class ClipboardWatcherExtension extends Extension {
             new PopupMenu.PopupSeparatorMenuItem(),
         );
 
-        const refreshItem = new PopupMenu.PopupMenuItem("Refresh");
-        refreshItem.connect("activate", () => {
-            this._readClipboard();
-        });
+
 
         const clearItem = new PopupMenu.PopupMenuItem("Clear");
         clearItem.connect("activate", () => {
             this._clearClipboard();
         });
 
-        this._indicator.menu.addMenuItem(refreshItem);
         this._indicator.menu.addMenuItem(clearItem);
 
         this._indicator.menu.connect("open-state-changed", (_menu, open) => {
