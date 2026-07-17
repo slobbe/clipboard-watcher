@@ -4,8 +4,8 @@ A GNOME Shell extension that shows the current clipboard contents in the panel m
 
 ## Features
 
-- Panel indicator with a clipboard preview
-- Automatic refresh when the menu opens, plus a clear action
+- Clipboard preview
+- Clear clipboard contents
 
 ## Install
 
