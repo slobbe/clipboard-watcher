@@ -39,4 +39,35 @@ jobs:
                   python-version: "3.12"
             - run: python -m pip install shexli==0.2.1
             - run: make zip
-            - run: shexli dist/clipboard-watcher@slobbe.github.io.zip --format text
+            - name: Run shexli
+              run: shexli dist/clipboard-watcher@slobbe.github.io.zip --format json > shexli.json
+            - name: Summarize shexli findings
+              if: always()
+              run: |
+                  {
+                      echo "## shexli"
+                      jq -r '.summary.severity_counts | to_entries[] | "- \(.key): \(.value)"' shexli.json
+                  } >> "$GITHUB_STEP_SUMMARY"
+            - name: Annotate shexli findings
+              if: always()
+              run: |
+                  jq -r '
+                      .findings[]
+                      | . as $finding
+                      | .evidence[]?
+                      | [$finding.severity, $finding.rule_id, $finding.message, .path, (.line | tostring)]
+                      | @tsv
+                  ' shexli.json | while IFS=$'\t' read -r severity rule message path line; do
+                      file="${path#*:}"
+                      if [ "$file" != "metadata.json" ]; then
+                          file="src/$file"
+                      fi
+
+                      case "$severity" in
+                          error) annotation=error ;;
+                          warning) annotation=warning ;;
+                          *) annotation=notice ;;
+                      esac
+
+                      printf '::%s file=%s,line=%s::[%s] %s\n' "$annotation" "$file" "$line" "$rule" "$message"
+                  done
