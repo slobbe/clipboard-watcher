@@ -26,7 +26,7 @@ export function useClipboard(
 
     /** @returns {Promise<ClipboardContent>} Complete clipboard content metadata. */
     function getClipboardContent() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             clipboard.get_text(clipboardType, async (_clipboard, text) => {
                 resolve(await createContent(text, getMimeTypes()));
             });
@@ -34,7 +34,7 @@ export function useClipboard(
     }
 
     function getContentSize(mime) {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             clipboard.get_content(clipboardType, mime, (_clipboard, bytes) => {
                 resolve(bytes ? bytes.get_size() : null);
             });
@@ -86,12 +86,13 @@ export function useClipboard(
 }
 
 function findTextMimeType(mimeTypes) {
-    return mimeTypes.find(type => type.startsWith("text/")) ?? "text/plain";
+    return mimeTypes.find((type) => type.startsWith("text/")) ?? "text/plain";
 }
 
 function findNonTextMimeType(mimeTypes) {
-    return mimeTypes.find(type =>
-        !type.startsWith("text/") &&
-        !["UTF8_STRING", "STRING", "COMPOUND_TEXT"].includes(type),
+    return mimeTypes.find(
+        (type) =>
+            !type.startsWith("text/") &&
+            !["UTF8_STRING", "STRING", "COMPOUND_TEXT"].includes(type),
     );
 }

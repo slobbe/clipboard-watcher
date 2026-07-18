@@ -6,12 +6,21 @@ METADATA_FILE := metadata.json
 PACKAGE_FILES := $(SOURCE_FILES) $(METADATA_FILE)
 JAVASCRIPT_FILES := $(shell find src -type f -name '*.js')
 
-.PHONY: zip check install clean enable disable reload uninstall
+.PHONY: zip check lint format-check format install clean enable disable reload uninstall
 
 zip: $(ARCHIVE)
 
 check:
 	@for source in $(JAVASCRIPT_FILES); do node --check $$source || exit $$?; done
+
+lint:
+	npm run lint
+
+format-check:
+	npm run format:check
+
+format:
+	npm run format
 
 $(ARCHIVE): $(PACKAGE_FILES)
 	mkdir -p $(DIST_DIR)

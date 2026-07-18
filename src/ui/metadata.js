@@ -35,15 +35,14 @@ export function Metadata() {
     };
 }
 
-function formatContent({kind, byteSize, charCount} = {}) {
+function formatContent({ kind, byteSize, charCount } = {}) {
     if (kind === "text" && byteSize !== null && charCount !== null) {
         const characterLabel = charCount === 1 ? "char" : "chars";
 
         return `${charCount} ${characterLabel} · ${formatByteSize(byteSize)}`;
     }
 
-    if (kind === "binary" && byteSize !== null)
-        return formatByteSize(byteSize);
+    if (kind === "binary" && byteSize !== null) return formatByteSize(byteSize);
 
     return "";
 }

@@ -14,7 +14,7 @@ import { Metadata } from "./metadata.js";
  *   clear: () => void,
  * }} Footer component.
  */
-export function Footer({onClear}) {
+export function Footer({ onClear }) {
     const element = new PopupMenu.PopupMenuSection();
     const separator = new PopupMenu.PopupBaseMenuItem({
         reactive: false,

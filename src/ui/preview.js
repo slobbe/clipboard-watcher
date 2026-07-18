@@ -40,7 +40,7 @@ export function Preview() {
 
     /** Restores the empty clipboard placeholder. */
     function clear() {
-        setContent({kind: "empty"});
+        setContent({ kind: "empty" });
     }
 
     return {
@@ -50,28 +50,25 @@ export function Preview() {
     };
 }
 
-function formatContent({kind, content, mime} = {}) {
+function formatContent({ kind, content, mime } = {}) {
     if (kind === "text") {
         const previewText = formatText(content ?? "");
-        if (previewText)
-            return {text: previewText, isEmpty: false};
+        if (previewText) return { text: previewText, isEmpty: false };
     }
 
-    if (kind === "binary" && mime)
-        return {text: `[${mime}]`, isEmpty: false};
+    if (kind === "binary" && mime) return { text: `[${mime}]`, isEmpty: false };
 
-    return {text: EMPTY_PREVIEW, isEmpty: true};
+    return { text: EMPTY_PREVIEW, isEmpty: true };
 }
 
 function formatText(text) {
     const lines = text
         .trim()
         .split(/\r?\n/)
-        .filter(line => line.trim())
-        .map(line => line.trim());
+        .filter((line) => line.trim())
+        .map((line) => line.trim());
 
-    if (lines.length === 0)
-        return null;
+    if (lines.length === 0) return null;
 
     return lines.length > MAX_PREVIEW_LINES
         ? `${lines.slice(0, MAX_PREVIEW_LINES).join("\n")}\n…`

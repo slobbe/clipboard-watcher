@@ -31,16 +31,21 @@ export default class ClipboardWatcherExtension extends Extension {
         this._indicator.menu.addMenuItem(this._footer.element);
         this._footer.clear();
 
-        this._indicator.menu.connect("open-state-changed", (_menu, open) => {
-            if (open) this._readClipboard();
-        });
+        this._menuOpenSignalId = this._indicator.menu.connect(
+            "open-state-changed",
+            (_menu, open) => {
+                if (open) this._readClipboard();
+            },
+        );
 
         Main.panel.addToStatusArea(this.uuid, this._indicator);
     }
 
     disable() {
         this._clipboardReadId++;
-        this._indicator?.destroy();
+        this._indicator.menu.disconnect(this._menuOpenSignalId);
+        this._menuOpenSignalId = null;
+        this._indicator.destroy();
         this._indicator = null;
         this._preview = null;
         this._footer = null;
@@ -64,6 +69,4 @@ export default class ClipboardWatcherExtension extends Extension {
         this._preview.clear();
         this._footer.clear();
     }
-
-
 }
