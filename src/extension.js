@@ -12,7 +12,7 @@ export default class ClipboardWatcherExtension extends Extension {
     enable() {
         this._clipboardReadId = 0;
         this._clipboard = useClipboard();
-        this._indicator = new PanelMenu.Button(0, "Clipboard Watcher");
+        this._indicator = new PanelMenu.Button(0.5, "Clipboard Watcher");
 
         this._indicator.add_child(
             new St.Icon({
