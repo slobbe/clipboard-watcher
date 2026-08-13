@@ -19,6 +19,7 @@ export function Preview() {
     });
     const label = element.label;
 
+    element.actor.remove_style_pseudo_class("insensitive");
     label.add_style_class_name("clipboard-preview");
 
     /** Formats and displays complete clipboard content. */
@@ -26,6 +27,10 @@ export function Preview() {
         const presentation = formatContent(content);
 
         label.text = presentation.text;
+        if (presentation.isEmpty)
+            element.actor.add_style_pseudo_class("insensitive");
+        else element.actor.remove_style_pseudo_class("insensitive");
+
         label.remove_style_class_name(
             presentation.isEmpty
                 ? "clipboard-preview-content"
