@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema id="org.gnome.shell.extensions.clipboard-watcher" path="/org/gnome/shell/extensions/clipboard-watcher/">
+        <key name="clear-after-seconds" type="u">
+            <default>0</default>
+            <summary>Automatically clear the clipboard after this delay</summary>
+            <description>Number of seconds before the clipboard is cleared. Zero disables automatic clearing.</description>
+        </key>
+    </schema>
+</schemalist>

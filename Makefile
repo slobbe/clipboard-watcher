@@ -2,31 +2,24 @@ UUID := clipboard-watcher@slobbe.github.io
 DIST_DIR := dist
 ARCHIVE := $(DIST_DIR)/$(UUID).zip
 SOURCE_FILES := $(shell find src -type f)
+SCHEMA_FILES := $(shell find schemas -type f)
 METADATA_FILE := metadata.json
-PACKAGE_FILES := $(SOURCE_FILES) $(METADATA_FILE)
+PACKAGE_FILES := $(SOURCE_FILES) $(SCHEMA_FILES) $(METADATA_FILE)
 JAVASCRIPT_FILES := $(shell find src -type f -name '*.js')
 
-.PHONY: zip check lint format-check format install clean enable disable reload uninstall
+.PHONY: zip check install clean enable disable reload uninstall
 
 zip: $(ARCHIVE)
 
 check:
 	@for source in $(JAVASCRIPT_FILES); do node --check $$source || exit $$?; done
-
-lint:
-	npm run lint
-
-format-check:
-	npm run format:check
-
-format:
-	npm run format
+	glib-compile-schemas --strict --dry-run schemas
 
 $(ARCHIVE): $(PACKAGE_FILES)
 	mkdir -p $(DIST_DIR)
 	rm -f $@
 	cd src && zip -qr ../$@ .
-	zip -q $@ $(METADATA_FILE)
+	zip -qr $@ $(METADATA_FILE) schemas
 
 install: zip
 	gnome-extensions install --force $(ARCHIVE)

@@ -4,5 +4,6 @@
     "description": "Watch the contents of the clipboard",
     "shell-version": [ "45", "46", "47", "48", "49" ],
     "url": "https://github.com/slobbe/clipboard-watcher",
+    "settings-schema": "org.gnome.shell.extensions.clipboard-watcher",
     "version-name": "0.1.0"
 }

@@ -6,6 +6,7 @@ A GNOME Shell extension that shows the current clipboard contents in the panel m
 
 - Clipboard preview
 - Clear clipboard contents
+- Optional automatic clipboard clearing after a configurable delay
 
 ## Install
 
