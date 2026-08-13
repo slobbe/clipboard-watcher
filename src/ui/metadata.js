@@ -13,6 +13,7 @@ import St from "gi://St";
 export function Metadata() {
     const element = new St.Label({
         x_expand: true,
+        x_align: Clutter.ActorAlign.END,
         y_align: Clutter.ActorAlign.CENTER,
     });
 

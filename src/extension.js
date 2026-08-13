@@ -35,11 +35,16 @@ export default class ClipboardWatcherExtension extends Extension {
         this._preview.clear();
         this._indicator.menu.addMenuItem(this._preview.element);
 
-        this._footer = Footer({
-            onClear: () => this._clearClipboard(),
-        });
+        this._footer = Footer();
         this._indicator.menu.addMenuItem(this._footer.element);
         this._footer.clear();
+
+        this._indicator.menu.addMenuItem(
+            new PopupMenu.PopupSeparatorMenuItem(),
+        );
+        const clearItem = new PopupMenu.PopupMenuItem("Clear");
+        clearItem.connect("activate", () => this._clearClipboard());
+        this._indicator.menu.addMenuItem(clearItem);
 
         const preferencesItem = new PopupMenu.PopupMenuItem("Preferences…");
         preferencesItem.connect("activate", () => this.openPreferences());
